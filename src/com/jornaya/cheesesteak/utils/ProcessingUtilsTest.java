@@ -136,11 +136,11 @@ public class ProcessingUtilsTest {
 
                 // Jobs is incorrect
                 add(dummyClassification("LeadId3", "Jobs", ".2", ".1"));
-                add(dummyClassification("LeadId3", "Jobs", ".2", ".1|.1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".1;.1"));
 
                 // Legal is incorrect
                 add(dummyClassification("LeadId4", "Legal", ".3",".1"));
-                add(dummyClassification("LeadId4", "Legal", ".3|.3", "1"));
+                add(dummyClassification("LeadId4", "Legal", ".3;.3", "1"));
             }
         };
 
@@ -159,12 +159,12 @@ public class ProcessingUtilsTest {
                 add(dummyClassification("LeadId1", "Jobs", ".3", ""));
 
                 // Jobs is correct
-                add(dummyClassification("LeadId3", "Jobs", ".2|.3", ".1"));
-                add(dummyClassification("LeadId3", "Jobs", ".2|.3", ".1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2;.3", ".1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2;.3", ".1"));
 
                 // Legal is correct
                 add(dummyClassification("LeadId4", "Legal", "",".1"));
-                add(dummyClassification("LeadId4", "Legal", ".3|.2", ".2|.3"));
+                add(dummyClassification("LeadId4", "Legal", ".3;.2", ".2;.3"));
             }
         };
         List<String> mismatchedIndustries = ProcessingUtils.findLeadsWithIncorrectIndustryCounts(classifications);
@@ -193,11 +193,11 @@ public class ProcessingUtilsTest {
                 add(dummyClassification("LeadId1", "Jobs", ".3", ".1"));
 
                 // Jobs is incorrect
-                add(dummyClassification("LeadId3", "Jobs", ".2", ".2|.1"));
-                add(dummyClassification("LeadId3", "Jobs", ".1", ".1|.1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".2;.1"));
+                add(dummyClassification("LeadId3", "Jobs", ".1", ".1;.1"));
 
                 // Legal is incorrect
-                add(dummyClassification("LeadId4", "Legal", ".1|.1|.1",".1"));
+                add(dummyClassification("LeadId4", "Legal", ".1;.1;.1",".1"));
                 add(dummyClassification("LeadId4", "Legal", ".3", ".4"));
             }
         };
@@ -212,15 +212,15 @@ public class ProcessingUtilsTest {
         List<ClassificationRecord> classifications = new ArrayList<ClassificationRecord>() {
             {
                 // Jobs is correct
-                add(dummyClassification("LeadId1", "Jobs", ".3|.1", ".1|.1"));
+                add(dummyClassification("LeadId1", "Jobs", ".3;.1", ".1;.1"));
                 add(dummyClassification("LeadId1", "Jobs", ".3", ".1"));
 
                 // Jobs is correct
                 add(dummyClassification("LeadId3", "Jobs", ".2", ".2"));
-                add(dummyClassification("LeadId3", "Jobs", ".3|.1", ".2|.1"));
+                add(dummyClassification("LeadId3", "Jobs", ".3;.1", ".2;.1"));
 
                 // Legal is correct
-                add(dummyClassification("LeadId4", "Legal", ".3|.1",".1|.1"));
+                add(dummyClassification("LeadId4", "Legal", ".3;.1",".1;.1"));
                 add(dummyClassification("LeadId4", "Legal", ".3", ".7"));
             }
         };

@@ -121,9 +121,9 @@ public class ClassificationRecordTest {
     }
 
     @Test
-    public void calculateIndustryCountReturnsValueWithPipeDelimitedSeparatedStrings() {
-        assertEquals(3, record.calculateIndustryCount("0.32|0.21|0.22"));
-        assertEquals(2, record.calculateIndustryCount("0.32|0.21"));
+    public void calculateIndustryCountReturnsValueWithDelimitedSeparatedStrings() {
+        assertEquals(3, record.calculateIndustryCount("0.32;0.21;0.22"));
+        assertEquals(2, record.calculateIndustryCount("0.32;0.21"));
     }
 
     @Test
@@ -138,9 +138,9 @@ public class ClassificationRecordTest {
     }
 
     @Test
-    public void calculateIndustryTotalReturnsValueWithPipeDelimitedString() {
-        assertEquals(0.74, record.calculateIndustryTotal("0.32|0.21|0.21"), 0.01);
-        assertEquals(0.42, record.calculateIndustryTotal("0.21|0.21"), 0.01);
+    public void calculateIndustryTotalReturnsValueWithDelimitedString() {
+        assertEquals(0.74, record.calculateIndustryTotal("0.32;0.21;0.21"), 0.01);
+        assertEquals(0.42, record.calculateIndustryTotal("0.21;0.21"), 0.01);
     }
 
 }

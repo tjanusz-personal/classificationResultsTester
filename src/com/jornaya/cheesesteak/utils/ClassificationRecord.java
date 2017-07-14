@@ -418,7 +418,7 @@ public class ClassificationRecord {
         if (industry == null || industry.isEmpty() || industry.equalsIgnoreCase("0")) {
             return 0;
         }
-        String[] strings = industry.split("\\|");
+        String[] strings = industry.split("\\;");
         return strings.length;
     }
 
@@ -427,7 +427,7 @@ public class ClassificationRecord {
             return 0;
         }
         // string should be ; separate list at some point in future
-        String[] strings = industry.split("\\|");
+        String[] strings = industry.split("\\;");
         List<String> stringList = Arrays.asList(strings);
         double total = stringList.stream().mapToDouble(Double::new).sum();
         return total;
