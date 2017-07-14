@@ -109,4 +109,38 @@ public class ClassificationRecordTest {
         assertEquals(0, maxScore, .01);
     }
 
+    @Test
+    public void calculateIndustryCountReturnsZeroWithEmptyString() {
+        assertEquals(0, record.calculateIndustryCount(""));
+        assertEquals(0, record.calculateIndustryCount(null));
+    }
+
+    @Test
+    public void calculateIndustryCountReturnsValueWithSingleString() {
+        assertEquals(1, record.calculateIndustryCount("0.32"));
+    }
+
+    @Test
+    public void calculateIndustryCountReturnsValueWithPipeDelimitedSeparatedStrings() {
+        assertEquals(3, record.calculateIndustryCount("0.32|0.21|0.22"));
+        assertEquals(2, record.calculateIndustryCount("0.32|0.21"));
+    }
+
+    @Test
+    public void calculateIndustryTotalReturnsZeroWithEmptyString() {
+        assertEquals(0, record.calculateIndustryTotal(""), 0.01);
+        assertEquals(0, record.calculateIndustryTotal(null), 0.01);
+    }
+
+    @Test
+    public void calculateIndustryTotalReturnsValueWithSingleString() {
+        assertEquals(0.32, record.calculateIndustryTotal("0.32"), 0.01);
+    }
+
+    @Test
+    public void calculateIndustryTotalReturnsValueWithPipeDelimitedString() {
+        assertEquals(0.74, record.calculateIndustryTotal("0.32|0.21|0.21"), 0.01);
+        assertEquals(0.42, record.calculateIndustryTotal("0.21|0.21"), 0.01);
+    }
+
 }

@@ -49,7 +49,7 @@ public class Main {
     public static List<String> findIndustryTotalErrors(Reader theReader) {
         BufferedReader br = new BufferedReader(theReader);
         List<ClassificationRecord> classificationRecords = br.lines().skip(1)
-                .map(ProcessingUtils.mapCSVToIndustryTotalRecord).collect(Collectors.toList());
+                .map(ProcessingUtils.mapCSVToIndustryTotalCountRecord).collect(Collectors.toList());
 
         List<String> leadsWithInvalidTotals = ProcessingUtils.findLeadsWithIncorrectIndustryTotals
                 (classificationRecords);

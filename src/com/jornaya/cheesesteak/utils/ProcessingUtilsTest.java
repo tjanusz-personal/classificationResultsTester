@@ -11,42 +11,6 @@ import static org.junit.Assert.assertEquals;
 public class ProcessingUtilsTest {
 
     @Test
-    public void getColumnDoubleValueReturns0ForPositionLongerThanArray() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(0.0, ProcessingUtils.getColumnDoubleValue(lineAsArray,8),.01);
-    }
-
-    @Test
-    public void getColumnCount1ValueReturns1ForColumnHavingValue() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(1, ProcessingUtils.getColumnCountValue(lineAsArray,2));
-    }
-
-    @Test
-    public void getColumnCountValueReturns0ForColumnMissingValue() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(0, ProcessingUtils.getColumnCountValue(lineAsArray,1));
-    }
-
-    @Test
-    public void getColumnCountValueReturns0ForPositionLongerThanArray() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(0, ProcessingUtils.getColumnCountValue(lineAsArray,8));
-    }
-
-    @Test
-    public void getColumnDoubleValueReturnsValueForColumnHavingValue() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(0.33, ProcessingUtils.getColumnDoubleValue(lineAsArray,2),.01);
-    }
-
-    @Test
-    public void getColumnDoubleValueReturns0ForColumnMissingValue() throws Exception {
-        String[] lineAsArray = { "","","0.33", "", "0.22"};
-        Assert.assertEquals(0.0, ProcessingUtils.getColumnDoubleValue(lineAsArray,1),.01);
-    }
-
-    @Test
     public void mapCSVToIndustryCountRecordReturnsCorrectPopulatedObject() throws Exception {
         String lineAsString = "campaign_industry,classification_method,lead_id,record_id,econtext_response_status,industry";
         ClassificationRecord classificationRecord = ProcessingUtils.mapCSVToIndustryCountRecord.apply(lineAsString);
@@ -70,16 +34,16 @@ public class ProcessingUtilsTest {
         assertEquals("lead_id", classificationRecord.getLeadId());
         assertEquals("record_id", classificationRecord.getRecordId());
         assertEquals("industry", classificationRecord.getIndustry());
-        assertEquals(0, classificationRecord.getScoreOther(), 0.1);
-        assertEquals(1, classificationRecord.getScoreAutoSales(),0.1);
-        assertEquals(1,classificationRecord.getScoreEducation(), .1);
-        assertEquals(1, classificationRecord.getScoreInsurance(), .1);
-        assertEquals(1, classificationRecord.getScoreLegal(), .1);
-        assertEquals(1, classificationRecord.getScoreFinancialServices(), .1);
-        assertEquals(1, classificationRecord.getScoreRealEstate(), .1);
-        assertEquals(1, classificationRecord.getScoreHomeServices(), .1);
-        assertEquals(1, classificationRecord.getScoreJobs(), .1);
-        assertEquals(1, classificationRecord.getScoreSeniorLiving(), .1);
+        assertEquals(0, classificationRecord.getScoreOtherCount(), 0.1);
+        assertEquals(1, classificationRecord.getScoreAutoSalesCount(),0.1);
+        assertEquals(1,classificationRecord.getScoreEducationCount(), .1);
+        assertEquals(1, classificationRecord.getScoreInsuranceCount(), .1);
+        assertEquals(1, classificationRecord.getScoreLegalCount(), .1);
+        assertEquals(1, classificationRecord.getScoreFinancialServicesCount(), .1);
+        assertEquals(1, classificationRecord.getScoreRealEstateCount(), .1);
+        assertEquals(1, classificationRecord.getScoreHomeServicesCount(), .1);
+        assertEquals(1, classificationRecord.getScoreJobsCount(), .1);
+        assertEquals(1, classificationRecord.getScoreSeniorLivingCount(), .1);
     }
 
     @Test
@@ -95,66 +59,16 @@ public class ProcessingUtilsTest {
         assertEquals("lead_id", classificationRecord.getLeadId());
         assertEquals("record_id", classificationRecord.getRecordId());
         assertEquals("industry", classificationRecord.getIndustry());
-        assertEquals(0, classificationRecord.getScoreOther(), 0.1);
-        assertEquals(1, classificationRecord.getScoreAutoSales(),0.1);
-        assertEquals(0,classificationRecord.getScoreEducation(), .1);
-        assertEquals(0, classificationRecord.getScoreInsurance(), .1);
-        assertEquals(0, classificationRecord.getScoreLegal(), .1);
-        assertEquals(0, classificationRecord.getScoreFinancialServices(), .1);
-        assertEquals(0, classificationRecord.getScoreRealEstate(), .1);
-        assertEquals(0, classificationRecord.getScoreHomeServices(), .1);
-        assertEquals(0, classificationRecord.getScoreJobs(), .1);
-        assertEquals(0, classificationRecord.getScoreSeniorLiving(), .1);
-    }
-
-    @Test
-    public void mapCSVToIndustryTotalRecordReturnsCorrectPopulatedObject() throws Exception {
-        // campaign_industry	classification_method	lead_id	record_id	econtext_response_status	industry
-        // other	auto_sales	education	insurance	legal	financial_services	real_estate	home_services
-        // jobs	senior_living
-        String lineAsString = "campaign_industry,classification_method,lead_id,record_id,econtext_response_status," +
-                "industry,0,.1,.2,.3,.4,.5,.6,.7,.8,.9";
-        ClassificationRecord classificationRecord = ProcessingUtils.mapCSVToIndustryTotalRecord.apply(lineAsString);
-        assertEquals("campaign_industry", classificationRecord.getCampaignClassification());
-        assertEquals("classification_method", classificationRecord.getClassificationMethod());
-        assertEquals("lead_id", classificationRecord.getLeadId());
-        assertEquals("record_id", classificationRecord.getRecordId());
-        assertEquals("industry", classificationRecord.getIndustry());
-        assertEquals(0, classificationRecord.getScoreOther(), 0.1);
-        assertEquals(.1, classificationRecord.getScoreAutoSales(),0.1);
-        assertEquals(.2,classificationRecord.getScoreEducation(), .1);
-        assertEquals(.3, classificationRecord.getScoreInsurance(), .1);
-        assertEquals(.4, classificationRecord.getScoreLegal(), .1);
-        assertEquals(.5, classificationRecord.getScoreFinancialServices(), .1);
-        assertEquals(.6, classificationRecord.getScoreRealEstate(), .1);
-        assertEquals(.7, classificationRecord.getScoreHomeServices(), .1);
-        assertEquals(.8, classificationRecord.getScoreJobs(), .1);
-        assertEquals(.9, classificationRecord.getScoreSeniorLiving(), .1);
-    }
-
-    @Test
-    public void mapCSVToIndustryTotalRecordReturnsCorrectPopulatedObjectWithMissingIndustries() throws Exception {
-        // campaign_industry	classification_method	lead_id	record_id	econtext_response_status	industry
-        // other	auto_sales	education	insurance	legal	financial_services	real_estate	home_services
-        // jobs	senior_living
-        String lineAsString = "campaign_industry,classification_method,lead_id,record_id,econtext_response_status," +
-                "industry,0,.1";
-        ClassificationRecord classificationRecord = ProcessingUtils.mapCSVToIndustryTotalRecord.apply(lineAsString);
-        assertEquals("campaign_industry", classificationRecord.getCampaignClassification());
-        assertEquals("classification_method", classificationRecord.getClassificationMethod());
-        assertEquals("lead_id", classificationRecord.getLeadId());
-        assertEquals("record_id", classificationRecord.getRecordId());
-        assertEquals("industry", classificationRecord.getIndustry());
-        assertEquals(0, classificationRecord.getScoreOther(), 0.1);
-        assertEquals(.1, classificationRecord.getScoreAutoSales(),0.1);
-        assertEquals(0,classificationRecord.getScoreEducation(), .1);
-        assertEquals(0, classificationRecord.getScoreInsurance(), .1);
-        assertEquals(0, classificationRecord.getScoreLegal(), .1);
-        assertEquals(0, classificationRecord.getScoreFinancialServices(), .1);
-        assertEquals(0, classificationRecord.getScoreRealEstate(), .1);
-        assertEquals(0, classificationRecord.getScoreHomeServices(), .1);
-        assertEquals(0, classificationRecord.getScoreJobs(), .1);
-        assertEquals(0, classificationRecord.getScoreSeniorLiving(), .1);
+        assertEquals(0, classificationRecord.getScoreOtherCount(), 0.1);
+        assertEquals(1, classificationRecord.getScoreAutoSalesCount(),0.1);
+        assertEquals(0,classificationRecord.getScoreEducationCount(), .1);
+        assertEquals(0, classificationRecord.getScoreInsuranceCount(), .1);
+        assertEquals(0, classificationRecord.getScoreLegalCount(), .1);
+        assertEquals(0, classificationRecord.getScoreFinancialServicesCount(), .1);
+        assertEquals(0, classificationRecord.getScoreRealEstateCount(), .1);
+        assertEquals(0, classificationRecord.getScoreHomeServicesCount(), .1);
+        assertEquals(0, classificationRecord.getScoreJobsCount(), .1);
+        assertEquals(0, classificationRecord.getScoreSeniorLivingCount(), .1);
     }
 
     @Test
@@ -217,16 +131,16 @@ public class ProcessingUtilsTest {
         List<ClassificationRecord> classifications = new ArrayList<ClassificationRecord>() {
             {
                 // Jobs is correct
-                add(dummyClassification("LeadId1", "Jobs", .3, 0));
-                add(dummyClassification("LeadId1", "Jobs", .3, 0));
+                add(dummyClassification("LeadId1", "Jobs", ".3", "0"));
+                add(dummyClassification("LeadId1", "Jobs", ".3", "0"));
 
                 // Jobs is incorrect
-                add(dummyClassification("LeadId3", "Jobs", .2, .1));
-                add(dummyClassification("LeadId3", "Jobs", 0, .1));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".1|.1"));
 
                 // Legal is incorrect
-                add(dummyClassification("LeadId4", "Legal", .3,.1));
-                add(dummyClassification("LeadId4", "Legal", .3, 0));
+                add(dummyClassification("LeadId4", "Legal", ".3",".1"));
+                add(dummyClassification("LeadId4", "Legal", ".3|.3", "1"));
             }
         };
 
@@ -241,28 +155,32 @@ public class ProcessingUtilsTest {
         List<ClassificationRecord> classifications = new ArrayList<ClassificationRecord>() {
             {
                 // Jobs is correct
-                add(dummyClassification("LeadId1", "Jobs", .3, 0));
-                add(dummyClassification("LeadId1", "Jobs", .3, 0));
+                add(dummyClassification("LeadId1", "Jobs", ".3", ""));
+                add(dummyClassification("LeadId1", "Jobs", ".3", ""));
 
                 // Jobs is correct
-                add(dummyClassification("LeadId3", "Jobs", .2, .1));
-                add(dummyClassification("LeadId3", "Jobs", .2, .1));
+                add(dummyClassification("LeadId3", "Jobs", ".2|.3", ".1"));
+                add(dummyClassification("LeadId3", "Jobs", ".2|.3", ".1"));
 
                 // Legal is correct
-                add(dummyClassification("LeadId4", "Legal", 0,.1));
-                add(dummyClassification("LeadId4", "Legal", .3, .2));
+                add(dummyClassification("LeadId4", "Legal", "",".1"));
+                add(dummyClassification("LeadId4", "Legal", ".3|.2", ".2|.3"));
             }
         };
         List<String> mismatchedIndustries = ProcessingUtils.findLeadsWithIncorrectIndustryCounts(classifications);
         assertEquals(0, mismatchedIndustries.size());
     }
 
-    private ClassificationRecord dummyClassification(String leadId, String industry, double scoreJobs, double scoreLegal) {
+    private ClassificationRecord dummyClassification(String leadId, String industry, String scoreJobs, String scoreLegal) {
         ClassificationRecord record = new ClassificationRecord();
         record.setIndustry(industry);
         record.setLeadId(leadId);
-        record.setScoreJobs(scoreJobs);
-        record.setScoreLegal(scoreLegal);
+        record.setRawScoreJobs(scoreJobs);
+        record.setScoreJobsCount(record.calculateIndustryCount(scoreJobs));
+        record.setScoreJobs(record.calculateIndustryTotal(scoreJobs));
+        record.setRawScoreLegal(scoreLegal);
+        record.setScoreLegalCount(record.calculateIndustryCount(scoreLegal));
+        record.setScoreLegal(record.calculateIndustryTotal(scoreLegal));
         return record;
     }
 
@@ -271,16 +189,16 @@ public class ProcessingUtilsTest {
         List<ClassificationRecord> classifications = new ArrayList<ClassificationRecord>() {
             {
                 // Jobs is correct
-                add(dummyClassification("LeadId1", "Jobs", .3, .1));
-                add(dummyClassification("LeadId1", "Jobs", .3, .1));
+                add(dummyClassification("LeadId1", "Jobs", ".3", ".1"));
+                add(dummyClassification("LeadId1", "Jobs", ".3", ".1"));
 
                 // Jobs is incorrect
-                add(dummyClassification("LeadId3", "Jobs", .2, .2));
-                add(dummyClassification("LeadId3", "Jobs", .1, .2));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".2|.1"));
+                add(dummyClassification("LeadId3", "Jobs", ".1", ".1|.1"));
 
                 // Legal is incorrect
-                add(dummyClassification("LeadId4", "Legal", .3,.1));
-                add(dummyClassification("LeadId4", "Legal", .3, 0));
+                add(dummyClassification("LeadId4", "Legal", ".1|.1|.1",".1"));
+                add(dummyClassification("LeadId4", "Legal", ".3", ".4"));
             }
         };
         List<String> mismatchedIndustries = ProcessingUtils.findLeadsWithIncorrectIndustryTotals(classifications);
@@ -294,16 +212,16 @@ public class ProcessingUtilsTest {
         List<ClassificationRecord> classifications = new ArrayList<ClassificationRecord>() {
             {
                 // Jobs is correct
-                add(dummyClassification("LeadId1", "Jobs", .3, .1));
-                add(dummyClassification("LeadId1", "Jobs", .3, .1));
+                add(dummyClassification("LeadId1", "Jobs", ".3|.1", ".1|.1"));
+                add(dummyClassification("LeadId1", "Jobs", ".3", ".1"));
 
                 // Jobs is correct
-                add(dummyClassification("LeadId3", "Jobs", .2, .2));
-                add(dummyClassification("LeadId3", "Jobs", .3, .2));
+                add(dummyClassification("LeadId3", "Jobs", ".2", ".2"));
+                add(dummyClassification("LeadId3", "Jobs", ".3|.1", ".2|.1"));
 
                 // Legal is correct
-                add(dummyClassification("LeadId4", "Legal", .3,.1));
-                add(dummyClassification("LeadId4", "Legal", .3, .7));
+                add(dummyClassification("LeadId4", "Legal", ".3|.1",".1|.1"));
+                add(dummyClassification("LeadId4", "Legal", ".3", ".7"));
             }
         };
         List<String> mismatchedIndustries = ProcessingUtils.findLeadsWithIncorrectIndustryTotals(classifications);

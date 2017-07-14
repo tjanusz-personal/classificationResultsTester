@@ -3,34 +3,21 @@ package com.jornaya.cheesesteak.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ProcessingUtils {
 
-    public static int getColumnCountValue(String[] lineAsArray, int position) {
+    private static String getColumnStringValue(String[] lineAsArray, int position) {
         if (lineAsArray.length <= position) {
-            return 0;
+            return "";
         }
         String rawValues = lineAsArray[position];
         if (rawValues.isEmpty()) {
-            return 0;
+            return "";
         }
-        if (Float.valueOf(lineAsArray[position]) > 0) {
-            return 1;
-        }
-        return 0;
-    }
-
-    public static double getColumnDoubleValue(String[] lineAsArray, int position) {
-        if (lineAsArray.length <= position) {
-            return 0;
-        }
-        String rawValues = lineAsArray[position];
-        if (rawValues.isEmpty()) {
-            return 0;
-        }
-        return Double.valueOf(lineAsArray[position]);
+        return lineAsArray[position];
     }
 
     // campaign_industry, classification_method, lead_id, record_id, econtext_response_status, industry
@@ -56,40 +43,21 @@ public class ProcessingUtils {
         item.setLeadId(lineArray[2]);
         item.setRecordId(lineArray[3]);
         item.setIndustry(lineArray[5]);
-        item.setScoreOther(ProcessingUtils.getColumnCountValue(lineArray, 6));
-        item.setScoreAutoSales(ProcessingUtils.getColumnCountValue(lineArray, 7));
-        item.setScoreEducation(ProcessingUtils.getColumnCountValue(lineArray, 8));
-        item.setScoreInsurance(ProcessingUtils.getColumnCountValue(lineArray, 9));
-        item.setScoreLegal(ProcessingUtils.getColumnCountValue(lineArray, 10));
-        item.setScoreFinancialServices(ProcessingUtils.getColumnCountValue(lineArray, 11));
-        item.setScoreRealEstate(ProcessingUtils.getColumnCountValue(lineArray, 12));
-        item.setScoreHomeServices(ProcessingUtils.getColumnCountValue(lineArray, 13));
-        item.setScoreJobs(ProcessingUtils.getColumnCountValue(lineArray, 14));
-        item.setScoreSeniorLiving(ProcessingUtils.getColumnCountValue(lineArray, 15));
-        return item;
-    };
 
-    // campaign_industry, classification_method, lead_id, record_id, econtext_response_status, industry
-    // other, auto_sales, education, insurance, legal, financial_services, real_estate, home_services
-    // jobs, senior_living
-    public static Function<String, ClassificationRecord> mapCSVToIndustryTotalRecord = (line) -> {
-        String[] lineArray = line.split(",");// a CSV has comma separated lines
-        ClassificationRecord item = new ClassificationRecord();
-        item.setCampaignClassification(lineArray[0]);
-        item.setClassificationMethod(lineArray[1]);
-        item.setLeadId(lineArray[2]);
-        item.setRecordId(lineArray[3]);
-        item.setIndustry(lineArray[5]);
-        item.setScoreOther(ProcessingUtils.getColumnDoubleValue(lineArray, 6));
-        item.setScoreAutoSales(ProcessingUtils.getColumnDoubleValue(lineArray, 7));
-        item.setScoreEducation(ProcessingUtils.getColumnDoubleValue(lineArray, 8));
-        item.setScoreInsurance(ProcessingUtils.getColumnDoubleValue(lineArray, 9));
-        item.setScoreLegal(ProcessingUtils.getColumnDoubleValue(lineArray, 10));
-        item.setScoreFinancialServices(ProcessingUtils.getColumnDoubleValue(lineArray, 11));
-        item.setScoreRealEstate(ProcessingUtils.getColumnDoubleValue(lineArray, 12));
-        item.setScoreHomeServices(ProcessingUtils.getColumnDoubleValue(lineArray, 13));
-        item.setScoreJobs(ProcessingUtils.getColumnDoubleValue(lineArray, 14));
-        item.setScoreSeniorLiving(ProcessingUtils.getColumnDoubleValue(lineArray, 15));
+        item.setRawScoreOther(ProcessingUtils.getColumnStringValue(lineArray, 6));
+        item.setRawScoreAutoSales(ProcessingUtils.getColumnStringValue(lineArray, 7));
+        item.setRawScoreEducation(ProcessingUtils.getColumnStringValue(lineArray, 8));
+        item.setRawScoreInsurance(ProcessingUtils.getColumnStringValue(lineArray, 9));
+        item.setRawScoreLegal(ProcessingUtils.getColumnStringValue(lineArray, 10));
+        item.setRawScoreFinancialServices(ProcessingUtils.getColumnStringValue(lineArray, 11));
+        item.setRawScoreRealEstate(ProcessingUtils.getColumnStringValue(lineArray, 12));
+        item.setRawScoreHomeServices(ProcessingUtils.getColumnStringValue(lineArray, 13));
+        item.setRawScoreJobs(ProcessingUtils.getColumnStringValue(lineArray, 14));
+        item.setRawScoreSeniorLiving(ProcessingUtils.getColumnStringValue(lineArray, 15));
+
+        // calculate the counts and total values from the raw strings
+        item.calculateCounts();
+        item.calculateTotals();
         return item;
     };
 
@@ -106,6 +74,37 @@ public class ProcessingUtils {
         return leadIdsWithDups;
     }
 
+    // static reducer function takes two classification objects and will combine their totals/counts
+    private static BinaryOperator<ClassificationRecord> reduceCountAndTotals = (classification1, classification2) -> {
+        ClassificationRecord res = new ClassificationRecord();
+        res.setScoreOtherCount(classification1.getScoreOtherCount() + classification2.getScoreOtherCount());
+        res.setScoreOther(classification1.getScoreOther() + classification2.getScoreOther());
+        res.setScoreRealEstateCount(classification1.getScoreRealEstateCount() + classification2.getScoreRealEstateCount());
+        res.setScoreRealEstate(classification1.getScoreRealEstate() + classification2.getScoreRealEstate());
+        res.setScoreLegalCount(classification1.getScoreLegalCount() + classification2.getScoreLegalCount());
+        res.setScoreLegal(classification1.getScoreLegal() + classification2.getScoreLegal());
+        res.setScoreJobsCount(classification1.getScoreJobsCount() + classification2.getScoreJobsCount());
+        res.setScoreJobs(classification1.getScoreJobs() + classification2.getScoreJobs());
+        res.setScoreInsuranceCount(classification1.getScoreInsuranceCount() + classification2.getScoreInsuranceCount());
+        res.setScoreInsurance(classification1.getScoreInsurance() + classification2.getScoreInsurance());
+        res.setScoreHomeServicesCount(classification1.getScoreHomeServicesCount() +
+                classification2.getScoreHomeServicesCount());
+        res.setScoreHomeServices(classification1.getScoreHomeServices() +
+                classification2.getScoreHomeServices());
+        res.setScoreFinancialServicesCount(classification1.getScoreFinancialServicesCount() +
+                classification2.getScoreFinancialServicesCount());
+        res.setScoreFinancialServices(classification1.getScoreFinancialServices() +
+                classification2.getScoreFinancialServices());
+        res.setScoreEducationCount(classification1.getScoreEducationCount() + classification2.getScoreEducationCount());
+        res.setScoreEducation(classification1.getScoreEducation() + classification2.getScoreEducation());
+        res.setScoreSeniorLivingCount(classification1.getScoreSeniorLivingCount() +
+                classification2.getScoreSeniorLivingCount());
+        res.setScoreSeniorLiving(classification1.getScoreSeniorLiving() + classification2.getScoreSeniorLiving());
+        res.setScoreAutoSalesCount(classification1.getScoreAutoSalesCount() + classification2.getScoreAutoSalesCount());
+        res.setScoreAutoSales(classification1.getScoreAutoSales() + classification2.getScoreAutoSales());
+        return res;
+    };
+
     public static List<String> findLeadsWithIncorrectIndustryCounts(List<ClassificationRecord> classificationRecords) {
         Map<String, List<ClassificationRecord>> classificationsByLeadId = classificationRecords.stream().collect
                 (Collectors.groupingBy(ClassificationRecord::getLeadId));
@@ -113,33 +112,12 @@ public class ProcessingUtils {
 
         for (String leadId : classificationsByLeadId.keySet()) {
             List<ClassificationRecord> classifications = classificationsByLeadId.get(leadId);
-            ClassificationRecord summaryRecord = new ClassificationRecord();
 
-            // Only count scores that have a value
-            long count = classifications.stream().filter(record -> record.getScoreAutoSales() > 0).count();
-            summaryRecord.setScoreAutoSales(count);
-            count = classifications.stream().filter(record -> record.getScoreSeniorLiving() > 0).count();
-            summaryRecord.setScoreSeniorLiving(count);
-            count = classifications.stream().filter(record -> record.getScoreEducation() > 0).count();
-            summaryRecord.setScoreEducation(count);
-            count = classifications.stream().filter(record -> record.getScoreFinancialServices() > 0).count();
-            summaryRecord.setScoreFinancialServices(count);
-            count = classifications.stream().filter(record -> record.getScoreHomeServices() > 0).count();
-            summaryRecord.setScoreHomeServices(count);
-            count = classifications.stream().filter(record -> record.getScoreInsurance() > 0).count();
-            summaryRecord.setScoreInsurance(count);
-            count = classifications.stream().filter(record -> record.getScoreJobs() > 0).count();
-            summaryRecord.setScoreJobs(count);
-            count = classifications.stream().filter(record -> record.getScoreLegal() > 0).count();
-            summaryRecord.setScoreLegal(count);
-            count = classifications.stream().filter(record -> record.getScoreRealEstate() > 0).count();
-            summaryRecord.setScoreRealEstate(count);
-            count = classifications.stream().filter(record -> record.getScoreOther() > 0).count();
-            summaryRecord.setScoreOther(count);
-
+            ClassificationRecord summaryRecord = classifications.stream().reduce(new ClassificationRecord(),
+                    reduceCountAndTotals);
             ClassificationRecord record = classifications.get(0);
-            double industryCount = summaryRecord.getScoreForIndustry(record.getIndustry());
-            double max = summaryRecord.getMaxScoreAcrossAllIndustries();
+            int industryCount = summaryRecord.getScoreCountForIndustry(record.getIndustry());
+            int max = summaryRecord.getMaxCountAcrossAllIndustries();
             if (industryCount < max && industryCount > 0) {
                 leadsWithInvalidCounts.add(record.getLeadId());
             }
@@ -155,25 +133,7 @@ public class ProcessingUtils {
         for (String leadId : classificationsByLeadId.keySet()) {
             List<ClassificationRecord> classifications = classificationsByLeadId.get(leadId);
             ClassificationRecord summaryRecord = classifications.stream().reduce(new ClassificationRecord(),
-                    (classification1, classification2) -> {
-
-                ClassificationRecord res = new ClassificationRecord();
-                res.setScoreOther(classification1.getScoreOther() + classification2.getScoreOther());
-                res.setScoreRealEstate(classification1.getScoreRealEstate() + classification2.getScoreRealEstate());
-                res.setScoreLegal(classification1.getScoreLegal() + classification2.getScoreLegal());
-                res.setScoreJobs(classification1.getScoreJobs() + classification2.getScoreJobs());
-                res.setScoreInsurance(classification1.getScoreInsurance() + classification2.getScoreInsurance());
-                res.setScoreHomeServices(classification1.getScoreHomeServices() +
-                        classification2.getScoreHomeServices());
-                res.setScoreFinancialServices(classification1.getScoreFinancialServices() +
-                        classification2.getScoreFinancialServices());
-                res.setScoreEducation(classification1.getScoreEducation() + classification2.getScoreEducation());
-                res.setScoreSeniorLiving(classification1.getScoreSeniorLiving() +
-                        classification2.getScoreSeniorLiving());
-                res.setScoreAutoSales(classification1.getScoreAutoSales() + classification2.getScoreAutoSales());
-                return res;
-            });
-
+                    reduceCountAndTotals);
             ClassificationRecord record = classifications.get(0);
             double industryTotal = summaryRecord.getScoreForIndustry(record.getIndustry());
             double max = summaryRecord.getMaxScoreAcrossAllIndustries();
