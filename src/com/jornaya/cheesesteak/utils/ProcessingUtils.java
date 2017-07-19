@@ -135,9 +135,17 @@ public class ProcessingUtils {
             ClassificationRecord summaryRecord = classifications.stream().reduce(new ClassificationRecord(),
                     reduceCountAndTotals);
             ClassificationRecord record = classifications.get(0);
+
+            int industryCount = summaryRecord.getScoreCountForIndustry(record.getIndustry());
+            int maxCount = summaryRecord.getMaxCountAcrossAllIndustries();
+
             double industryTotal = summaryRecord.getScoreForIndustry(record.getIndustry());
             double max = summaryRecord.getMaxScoreAcrossAllIndustries();
             if (industryTotal < max && industryTotal > 0) {
+                // if passing industry counts skip it..
+                if (industryCount >= maxCount) {
+                    continue;
+                }
                 leadsWithInvalidTotals.add(record.getLeadId());
             }
         }
